@@ -7,15 +7,31 @@ using NetChallenge.Exceptions;
 
 namespace NetChallenge.Infrastructure
 {
+    /// <summary>
+    /// Repositorio de reuniones (Booking)
+    /// </summary>
     public class BookingRepository : IBookingRepository
     {
         private IList<Booking> Bookings { get; set; } = new List<Booking>();
 
+        /// <summary>
+        /// Devuelve todas las reuniones
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Booking> AsEnumerable()
         {
             return Bookings;
         }
 
+        /// <summary>
+        /// Agrega una reunión
+        /// </summary>
+        /// <param name="item">Reunión a agregar</param>
+        /// <exception cref="InvalidOfficeNameException"></exception>
+        /// <exception cref="InvalidDurationException"></exception>
+        /// <exception cref="BookingWithoutUserNameException"></exception>
+        /// <exception cref="ExistingBookingAtSameDateTimeException"></exception>
+        /// <exception cref="InvalidLocationNameException"></exception>
         public void Add(Booking item)
         {
             DateTime start = item.DateTime;

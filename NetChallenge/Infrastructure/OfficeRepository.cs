@@ -6,15 +6,30 @@ using NetChallenge.Exceptions;
 
 namespace NetChallenge.Infrastructure
 {
+    /// <summary>
+    /// Repositorio de oficinas (Office)
+    /// </summary>
     public class OfficeRepository : IOfficeRepository
     {
         private IList<Office> Offices { get; set; } = new List<Office>();
 
+        /// <summary>
+        /// Devuelve todas las oficinas
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<Office> AsEnumerable()
         {
             return Offices;
         }
 
+        /// <summary>
+        /// Agrega una oficina nueva
+        /// </summary>
+        /// <param name="item">Oficina a agregar</param>
+        /// <exception cref="InvalidLocationNameException"></exception>
+        /// <exception cref="OfficeWithoutNameException"></exception>
+        /// <exception cref="ExistingOfficeNameInLocationException"></exception>
+        /// <exception cref="InvalidMaxCapacityException"></exception>
         public void Add(Office item)
         {
             if (item.Location == null)
