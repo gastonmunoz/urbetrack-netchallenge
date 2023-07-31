@@ -5,6 +5,7 @@ using NetChallenge.Abstractions;
 using NetChallenge.Domain;
 using NetChallenge.Dto.Input;
 using NetChallenge.Dto.Output;
+using NetChallenge.Infrastructure;
 
 namespace NetChallenge
 {
@@ -33,7 +34,16 @@ namespace NetChallenge
 
         public void AddOffice(AddOfficeRequest request)
         {
-            throw new NotImplementedException();
+            Location location = _locationRepository.AsEnumerable().FirstOrDefault(p => p.Name == request.LocationName);
+
+            Office office = new Office
+            {
+                Name = request.Name,
+                MaxCapacity = request.MaxCapacity,
+                AvailableResources = request.AvailableResources?.ToArray(),
+                Location = location
+            };
+            _officeRepository.Add(office);
         }
 
         public void BookOffice(BookOfficeRequest request)
@@ -57,7 +67,13 @@ namespace NetChallenge
 
         public IEnumerable<OfficeDto> GetOffices(string locationName)
         {
-            throw new NotImplementedException();
+            return _officeRepository.AsEnumerable().Where(p => p.Location.Name == locationName).Select(p => new OfficeDto()
+            {
+                Name = p.Name,
+                AvailableResources = p.AvailableResources,
+                LocationName = p.Location.Name,
+                MaxCapacity = p.MaxCapacity
+            });
         }
 
         public IEnumerable<OfficeDto> GetOfficeSuggestions(SuggestionsRequest request)
