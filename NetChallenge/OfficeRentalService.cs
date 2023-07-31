@@ -48,12 +48,32 @@ namespace NetChallenge
 
         public void BookOffice(BookOfficeRequest request)
         {
-            throw new NotImplementedException();
+            Location location = _locationRepository.AsEnumerable().FirstOrDefault(p => p.Name == request.LocationName);
+            Office office = _officeRepository.AsEnumerable().FirstOrDefault(p => p.Name == request.OfficeName);
+
+            Booking booking = new Booking
+            {
+                DateTime = request.DateTime,
+                Duration = request.Duration,
+                Office = office,
+                Location = location,
+                UserName = request.UserName
+            };
+
+            _bookingRepository.Add(booking);
         }
 
         public IEnumerable<BookingDto> GetBookings(string locationName, string officeName)
         {
-            throw new NotImplementedException();
+            return _bookingRepository.AsEnumerable().Where(p => p.Location.Name == locationName && p.Office.Name == officeName)
+                .Select(p => new BookingDto()
+                {
+                    UserName = p.UserName,
+                    DateTime = p.DateTime,
+                    Duration = p.Duration,
+                    OfficeName = p.Office.Name,
+                    LocationName = p.Location.Name
+                });
         }
 
         public IEnumerable<LocationDto> GetLocations()
@@ -78,7 +98,24 @@ namespace NetChallenge
 
         public IEnumerable<OfficeDto> GetOfficeSuggestions(SuggestionsRequest request)
         {
-            throw new NotImplementedException();
+            IList<Office> offices = _officeRepository.AsEnumerable().Where(p => p.MaxCapacity >= request.CapacityNeeded && p.HasThisResources(request.ResourcesNeeded)).ToList();
+            IOrderedEnumerable<Office> orderedOfficesByCapacity = offices.OrderBy(p => p.MaxCapacity);
+            IOrderedEnumerable<Office> orderedOfficesByResources = orderedOfficesByCapacity.OrderBy(p => p.AvailableResources.Count());
+            List<Office> officesInNeighborhood = orderedOfficesByResources.ToList();
+            
+            if (!string.IsNullOrWhiteSpace(request.PreferedNeigborHood))
+            {
+                officesInNeighborhood = orderedOfficesByResources.Where(p => p.Location.Neighborhood == request.PreferedNeigborHood).ToList();
+                officesInNeighborhood.AddRange(offices.Where(p => !officesInNeighborhood.Contains(p)));
+            }
+
+            return officesInNeighborhood.Select(p => new OfficeDto()
+            {
+                AvailableResources = p.AvailableResources,
+                LocationName = p.Location.Name,
+                MaxCapacity = p.MaxCapacity,
+                Name = p.Name
+            });
         }
     }
 }

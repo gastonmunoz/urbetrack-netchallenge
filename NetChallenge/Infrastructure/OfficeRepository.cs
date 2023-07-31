@@ -8,7 +8,7 @@ namespace NetChallenge.Infrastructure
 {
     public class OfficeRepository : IOfficeRepository
     {
-        public IList<Office> Offices { get; set; } = new List<Office>();
+        private IList<Office> Offices { get; set; } = new List<Office>();
 
         public IEnumerable<Office> AsEnumerable()
         {
