@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NetChallenge.Abstractions;
 using NetChallenge.Domain;
 using NetChallenge.Dto.Input;
@@ -47,7 +48,11 @@ namespace NetChallenge
 
         public IEnumerable<LocationDto> GetLocations()
         {
-            throw new NotImplementedException();
+            return _locationRepository.AsEnumerable().Select(p => new LocationDto()
+            {
+                Name = p.Name,
+                Neighborhood = p.Neighborhood,
+            });
         }
 
         public IEnumerable<OfficeDto> GetOffices(string locationName)
